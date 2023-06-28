@@ -24,7 +24,7 @@ const Login = ({navigation}) => {
                 text={"Countinue with Google"} 
                 bgColor={'white'} 
                 textColor={'gray'}
-                onPress={() => navigation.navigate('List')}
+                onPress={() => navigation.navigate('Setup')}
                 />
                 <AppleAuthButton/>
             </View>
