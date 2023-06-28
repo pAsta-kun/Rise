@@ -3,9 +3,6 @@ import LargeText from '../components/text/largeText';
 import TempButton from '../components/buttons/tempButton';
 import AppleAuthButton from '../components/buttons/appleAuthButton';
 
-
-
-
 const Login = ({navigation}) => {
     const styles = StyleSheet.create({
         background: {

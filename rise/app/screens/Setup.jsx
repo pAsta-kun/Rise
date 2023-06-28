@@ -77,7 +77,7 @@ function Setup( {navigation} )
     function nextPage(phoEnabled, fitEnabled)
     {
         if(phoEnabled && fitEnabled)
-            navigation.navigate('List') 
+            navigation.navigate('Camera') 
         else if(fitEnabled && !phoEnabled)
             navigation.navigate('List')
         else if(phoEnabled && !fitEnabled)
