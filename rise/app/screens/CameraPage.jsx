@@ -1,10 +1,12 @@
 import { Camera } from 'expo-camera';
 import { addDoc, collection } from 'firebase/firestore';
+import { ref, uploadBytes } from "firebase/storage";
+
 import React, { useState, useEffect, useRef } from 'react';
 import {Entypo} from '@expo/vector-icons'
 import { Text, View, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import RegularText from '../components/text/regularText';
-import { FIRESTORE_DB } from '../../firebaseConfig';
+import { FIRESTORE_DB, FIREBASE_STORAGE } from '../../firebaseConfig';
 
 function CameraPage()
 {
@@ -21,12 +23,30 @@ function CameraPage()
         })();
     }, []);
 
+    const uploadPicture = async (uri) => {
+        const doc = addDoc(imageRef, {imageuri: uri})
+
+        //Translates uri to blob
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        console.log(blob.size, blob.type);
+
+        //Uploads it to storage
+        const storageRef = ref(FIREBASE_STORAGE, 'image/' + Date.now())
+        uploadBytes(storageRef, blob).then((snapshot) => {
+            console.log('Uploaded a blob or file!');
+          });
+
+
+
+    }
+
     const takePicture = async () => {
         if (cameraRef.current) {
             const options = { quality: 0.5, base64: true };
             const data = await cameraRef.current.takePictureAsync(options);
             console.log(data.uri);
-            const doc = addDoc(imageRef, {imageuri: data.uri})
+            uploadPicture(data.uri)
 
             Animated.sequence([
                 Animated.timing(fadeAnim, {
