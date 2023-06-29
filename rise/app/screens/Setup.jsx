@@ -64,11 +64,11 @@ function Setup( {navigation} )
                 
         
                 <DefaultButton 
-                text={"Next"} 
-                bgColor={'rgba(118, 118, 128, .30)'} 
-                textColor={'white'}
-                onPress={() => nextPage(isPhoEnabled, isFitEnabled)}
-                marginTop={200}
+                    text={"Next"} 
+                    bgColor={'rgba(118, 118, 128, .30)'} 
+                    textColor={'white'}
+                    onPress={() => nextPage(isPhoEnabled, isFitEnabled)}
+                    marginTop={200}
                 />
             </View>
         </ImageBackground>
