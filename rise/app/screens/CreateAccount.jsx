@@ -3,18 +3,20 @@ import LargeText from '../components/text/largeText';
 import DefaultButton from '../components/buttons/defaultButton';
 import RegularText from '../components/text/regularText';
 import { FIREBASE_AUTH } from '../../firebaseConfig';
-import { getAuth } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword  } from 'firebase/auth';
 import { useState } from 'react';
 
 
-const Login = ({navigation}) => {
+const CreateAccount = ({navigation}) => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confPassword, setConfPassword] = useState('');
     const auth = getAuth();
 
-    const signIn = () => {
-        signInWithEmailAndPassword(auth, email, password)
+    const signUp = (email, password) => {
+        console.log(email);
+        createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             //signed in
             const user = userCredential.user;
@@ -50,18 +52,19 @@ const Login = ({navigation}) => {
         style={styles.background}
         >
             <View>
-                <LargeText text={"Login"}/>
+                <LargeText text={"Create Account"} marginTop={100}/>
                 <TextInput style={styles.input} placeholder="Email" onChangeText={(text) => setEmail(text)} value={email}/>
                 <TextInput style={styles.input} textContentType="password" placeholder="Password" onChangeText={(text) => setPassword(text)} value={password}/>
-                <TouchableOpacity onPress={() => navigation.navigate('Create Account')}>
-                    <RegularText text={"Create Account"} size={16} color={"#9F86FF"}/>
-                </TouchableOpacity>
+                {password.length > 6 && (
+                    <TextInput style={styles.input} textContentType="password" placeholder="Confirm Password" onChangeText={(text) => setConfPassword(text)} value={confPassword}/>
+                )}
                 <DefaultButton 
-                    text={"Sign in"} 
+                    text={"Create Account"} 
                     bgColor={'rgba(118, 118, 128, .30)'} 
                     textColor={'white'}
-                    onPress={() => navigation.navigate('Setup')}
-                    marginTop={150}
+                    onPress={() => signUp(email, password)}
+                    marginTop={50}
+                    disabled={password.length < 6 && password !== confPassword}
                 />
             </View>
         </ImageBackground>
@@ -70,4 +73,4 @@ const Login = ({navigation}) => {
 
 }
 
-export default Login;
+export default CreateAccount;

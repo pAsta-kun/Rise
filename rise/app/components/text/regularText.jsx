@@ -3,8 +3,10 @@ import {View, Text, StyleSheet} from 'react-native';
 import * as Font from 'expo-font';
 
 
-function RegularText({text, size, marginT, marginB}) 
+function RegularText({text, size, marginT, marginB, color}) 
 {
+    if(color === undefined)
+        color = '#f7f7f7'
     const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
@@ -16,7 +18,7 @@ function RegularText({text, size, marginT, marginB})
         fontFamily: 'Montserrat',
         fontSize: size,
         textAlign: 'center',
-        color: 'white'
+        color: color
     },
 
 });

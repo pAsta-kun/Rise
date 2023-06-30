@@ -1,6 +1,6 @@
 import {TouchableOpacity, Text, StyleSheet, View} from 'react-native';
 
-function DefaultButton({text, bgColor, textColor, onPress, marginTop})
+function DefaultButton({text, bgColor, textColor, onPress, marginTop, disabled})
 {
 
     const styles = StyleSheet.create({
@@ -27,7 +27,7 @@ function DefaultButton({text, bgColor, textColor, onPress, marginTop})
 
     return(
         <View style={styles.container}>
-            <TouchableOpacity style={styles.button} onPress={onPress}>
+            <TouchableOpacity style={styles.button} onPress={onPress} disabled={disabled}>
                 <Text style={styles.buttonText}>{text}</Text>
             </TouchableOpacity>
         </View>
