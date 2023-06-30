@@ -36,11 +36,11 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={initialRoute}>
-        <Stack.Screen name='Login' component={Login}/>
-        <Stack.Screen name='Create Account' component={CreateAccount}/>
-        <Stack.Screen name='Setup' component={Setup}/>
-        <Stack.Screen name='Camera' component={CameraPage}/>
-        <Stack.Screen name='List' component={List}/>
+        <Stack.Screen name='Login' component={Login} options={{headerShown: false}}/>
+        <Stack.Screen name='Create Account' component={CreateAccount} options={{headerShown: false}}/>
+        <Stack.Screen name='Setup' component={Setup} options={{headerShown: false}}/>
+        <Stack.Screen name='Camera' component={CameraPage} options={{headerShown: false}}/>
+        <Stack.Screen name='List' component={List} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

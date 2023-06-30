@@ -2,13 +2,13 @@ import {View, ImageBackground, StyleSheet, TextInput, TouchableOpacity} from 're
 import LargeText from '../components/text/largeText';
 import DefaultButton from '../components/buttons/defaultButton';
 import RegularText from '../components/text/regularText';
-import { FIREBASE_AUTH } from '../../firebaseConfig';
+import { FIREBASE_AUTH, FIRESTORE_DB } from '../../firebaseConfig';
+import { addDoc, collection } from 'firebase/firestore'
 import { getAuth, createUserWithEmailAndPassword  } from 'firebase/auth';
 import { useState } from 'react';
 
 
 const CreateAccount = ({navigation}) => {
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confPassword, setConfPassword] = useState('');
@@ -20,7 +20,13 @@ const CreateAccount = ({navigation}) => {
         .then((userCredential) => {
             //signed in
             const user = userCredential.user;
-            console.log("Success!" + user);
+            console.log("Success!" + user.uid);
+            setUserID(user.uid);
+            const doc = addDoc(collection(FIRESTORE_DB, user.uid), {email: email, fitness: "N/A", photo: "N/A"}).then(() => {
+                console.log("Sent to DB")
+            })
+
+            navigation.navigate('Setup');
         })
         .catch((error) => {
             const errorCode = error.code;

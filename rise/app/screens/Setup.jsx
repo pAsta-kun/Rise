@@ -78,6 +78,7 @@ function Setup( {navigation} )
     {
         if(phoEnabled && fitEnabled)
             navigation.navigate('Camera') 
+            
         else if(fitEnabled && !phoEnabled)
             navigation.navigate('List')
         else if(phoEnabled && !fitEnabled)

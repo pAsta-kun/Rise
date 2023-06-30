@@ -3,7 +3,7 @@ import LargeText from '../components/text/largeText';
 import DefaultButton from '../components/buttons/defaultButton';
 import RegularText from '../components/text/regularText';
 import { FIREBASE_AUTH } from '../../firebaseConfig';
-import { getAuth } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 
 
@@ -13,12 +13,14 @@ const Login = ({navigation}) => {
     const [password, setPassword] = useState('');
     const auth = getAuth();
 
-    const signIn = () => {
+    const signIn = (email, password) => {
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             //signed in
             const user = userCredential.user;
-            console.log("Success!" + user);
+
+            //const doc = addDoc(collection(FIRESTORE_DB, ), {title: todo, done: false})
+            console.log("Success!" + user.uid);
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -60,7 +62,7 @@ const Login = ({navigation}) => {
                     text={"Sign in"} 
                     bgColor={'rgba(118, 118, 128, .30)'} 
                     textColor={'white'}
-                    onPress={() => navigation.navigate('Setup')}
+                    onPress={() => signIn(email, password)}
                     marginTop={150}
                 />
             </View>
