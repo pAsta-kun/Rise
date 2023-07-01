@@ -3,15 +3,19 @@ import {View, Switch, ImageBackground, StyleSheet} from 'react-native';
 import RegularText from '../components/text/regularText';
 import LargeText from '../components/text/largeText';
 import DefaultButton from '../components/buttons/defaultButton';
+import { addDoc } from 'firebase/firestore'
+// import { userID } from '../../firebaseConfig';
 
 import React, { useState } from 'react';    
 
-function Setup( {navigation} )
+function Setup( {route, navigation} )
 {
     const [isFitEnabled, setIsFitEnabled] = useState(false);
     const toggleFitSwitch = () => setIsFitEnabled(previousState => !previousState);
     const [isPhoEnabled, setIsPhoEnabled] = useState(false);
     const togglePhoSwitch = () => setIsPhoEnabled(previousState => !previousState);
+    const { uid } = route.params;
+
 
     const styles = StyleSheet.create({
         background: {
@@ -76,8 +80,16 @@ function Setup( {navigation} )
 
     function nextPage(phoEnabled, fitEnabled)
     {
-        if(phoEnabled && fitEnabled)
-            navigation.navigate('Camera') 
+        if(phoEnabled && fitEnabled){ 
+            // console.log(userID);
+            // const user = firebase.auth().currentUser;
+            // console.log(user.uid);
+            const sentToDB = setDoc(doc(FIRESTORE_DB, "USERS", uid), {email: email, fitness: "N/A", photo: "N/A"}).then(() => {
+                console.log("Sent to DB")
+            })
+            navigation.navigate('Camera')
+        }
+            
             
         else if(fitEnabled && !phoEnabled)
             navigation.navigate('List')

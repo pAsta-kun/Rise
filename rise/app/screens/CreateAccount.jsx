@@ -2,8 +2,8 @@ import {View, ImageBackground, StyleSheet, TextInput, TouchableOpacity} from 're
 import LargeText from '../components/text/largeText';
 import DefaultButton from '../components/buttons/defaultButton';
 import RegularText from '../components/text/regularText';
-import { FIREBASE_AUTH, FIRESTORE_DB } from '../../firebaseConfig';
-import { addDoc, collection } from 'firebase/firestore'
+import { FIRESTORE_DB } from '../../firebaseConfig';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore'
 import { getAuth, createUserWithEmailAndPassword  } from 'firebase/auth';
 import { useState } from 'react';
 
@@ -15,18 +15,17 @@ const CreateAccount = ({navigation}) => {
     const auth = getAuth();
 
     const signUp = (email, password) => {
-        console.log(email);
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             //signed in
             const user = userCredential.user;
-            console.log("Success!" + user.uid);
-            setUserID(user.uid);
-            const doc = addDoc(collection(FIRESTORE_DB, user.uid), {email: email, fitness: "N/A", photo: "N/A"}).then(() => {
+            //Makes acc in db
+            const uid = user.uid;
+            const sentToDB = setDoc(doc(FIRESTORE_DB, "USERS", user.uid), {email: email, fitness: "N/A", photo: "N/A"}).then(() => {
                 console.log("Sent to DB")
             })
 
-            navigation.navigate('Setup');
+            navigation.navigate('Setup', {uid: uid});
         })
         .catch((error) => {
             const errorCode = error.code;
