@@ -21,7 +21,7 @@ const CreateAccount = ({navigation}) => {
             const user = userCredential.user;
             //Makes acc in db
             const uid = user.uid;
-            const sentToDB = setDoc(doc(FIRESTORE_DB, "USERS", user.uid), {email: email, fitness: "N/A", photo: "N/A"}).then(() => {
+            const sentToDB = setDoc(doc(FIRESTORE_DB, "USERS", user.uid), {email: email, setup: false, fitness: "N/A", photo: "N/A"}).then(() => {
                 console.log("Sent to DB")
             })
 

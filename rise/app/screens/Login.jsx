@@ -2,7 +2,8 @@ import {View, ImageBackground, StyleSheet, TextInput, TouchableOpacity} from 're
 import LargeText from '../components/text/largeText';
 import DefaultButton from '../components/buttons/defaultButton';
 import RegularText from '../components/text/regularText';
-import { FIREBASE_AUTH } from '../../firebaseConfig';
+import { FIREBASE_AUTH, FIRESTORE_DB } from '../../firebaseConfig';
+import { doc, getDoc } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 
@@ -11,16 +12,27 @@ const Login = ({navigation}) => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const auth = getAuth();
+    const auth = getAuth();;
 
     const signIn = (email, password) => {
+        console.log(email + password)
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
+            console.log("test")
             //signed in
             const user = userCredential.user;
+            //const docSnap = getDoc(FIRESTORE_DB, "USERS", user.uid)
+            console.log("test")
 
             //const doc = addDoc(collection(FIRESTORE_DB, ), {title: todo, done: false})
+            if (docSnap.exists()) {
+                console.log("Document data:", docSnap.data());
+              } else {
+                // docSnap.data() will be undefined in this case
+                console.log("No such document!");
+              }
             console.log("Success!" + user.uid);
+            
         })
         .catch((error) => {
             const errorCode = error.code;

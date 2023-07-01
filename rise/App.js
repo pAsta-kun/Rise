@@ -5,6 +5,7 @@ import List from './app/screens/List';
 import Login from './app/screens/Login';
 import Setup from './app/screens/Setup';
 import CameraPage from './app/screens/CameraPage';
+import FitnessSetup from './app/screens/FitnessSetup';
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import CreateAccount from './app/screens/CreateAccount';
@@ -40,6 +41,7 @@ export default function App() {
         <Stack.Screen name='Create Account' component={CreateAccount} options={{headerShown: false}}/>
         <Stack.Screen name='Setup' component={Setup} options={{headerShown: false}}/>
         <Stack.Screen name='Camera' component={CameraPage} options={{headerShown: false}}/>
+        <Stack.Screen name='FitnessSetup' component={FitnessSetup} options={{headerShown: false}}/>
         <Stack.Screen name='List' component={List} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>

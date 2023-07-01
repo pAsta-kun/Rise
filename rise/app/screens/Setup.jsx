@@ -3,7 +3,8 @@ import {View, Switch, ImageBackground, StyleSheet} from 'react-native';
 import RegularText from '../components/text/regularText';
 import LargeText from '../components/text/largeText';
 import DefaultButton from '../components/buttons/defaultButton';
-import { addDoc } from 'firebase/firestore'
+import { updateDoc , doc } from 'firebase/firestore'
+import { FIRESTORE_DB } from '../../firebaseConfig';
 // import { userID } from '../../firebaseConfig';
 
 import React, { useState } from 'react';    
@@ -84,7 +85,7 @@ function Setup( {route, navigation} )
             // console.log(userID);
             // const user = firebase.auth().currentUser;
             // console.log(user.uid);
-            const sentToDB = setDoc(doc(FIRESTORE_DB, "USERS", uid), {email: email, fitness: "N/A", photo: "N/A"}).then(() => {
+            const sentToDB = updateDoc(doc(FIRESTORE_DB, "USERS", uid), { setup: false, fitness: "N/A", photo: true}).then(() => {
                 console.log("Sent to DB")
             })
             navigation.navigate('Camera')
@@ -92,11 +93,21 @@ function Setup( {route, navigation} )
             
             
         else if(fitEnabled && !phoEnabled)
-            navigation.navigate('List')
+        {
+            const sentToDB = updateDoc(doc(FIRESTORE_DB, "USERS", uid), {setup: false, fitness: "N/A", photo: false}).then(() => {
+                console.log("Sent to DB")
+            })
+            navigation.navigate('FitnessSetup')
+        }
+            
         else if(phoEnabled && !fitEnabled)
+        {
+            const sentToDB = updateDoc(doc(FIRESTORE_DB, "USERS", uid), {setup: false, fitness: "N/A", photo: true}).then(() => {
+                console.log("Sent to DB")
+            })
             navigation.navigate('List')
-        else 
-            navigation.navigate('List')
+        }
+           
     }
 }
 
