@@ -2,12 +2,15 @@ import {View, TextInput, ImageBackground, StyleSheet, TouchableWithoutFeedback, 
 import LargeText from '../components/text/largeText';
 import RegularText from '../components/text/regularText';
 import DefaultButton from '../components/buttons/defaultButton';
+import { doc } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../firebaseConfig';
 import { updateDoc } from 'firebase/firestore'
 import React, { useState } from 'react'; 
 
 const FitnessSetup = ({navigation, route }) => 
 {
-    const { goToCamera, docRef } = route.params;
+    const { goToCamera, uid } = route.params;
+    const docRef = doc(FIRESTORE_DB, "USERS", uid);
     const [value, setValue] = useState();
     const dismissKeyboard = () => {
         if(Keyboard !== undefined)
@@ -35,7 +38,7 @@ const FitnessSetup = ({navigation, route }) =>
 
         console.log(state);
         if (state) {
-            navigation.navigate('Camera')
+            navigation.navigate('CameraSetupInfo', {uid: uid})
         } else {
             navigation.navigate('Login')
         }

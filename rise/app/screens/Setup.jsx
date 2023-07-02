@@ -4,7 +4,8 @@ import RegularText from '../components/text/regularText';
 import LargeText from '../components/text/largeText';
 import DefaultButton from '../components/buttons/defaultButton';
 import { updateDoc } from 'firebase/firestore'
-
+import { doc } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../firebaseConfig';
 import React, { useState } from 'react';    
 
 function Setup( {route, navigation} )
@@ -13,7 +14,8 @@ function Setup( {route, navigation} )
     const toggleFitSwitch = () => setIsFitEnabled(previousState => !previousState);
     const [isPhoEnabled, setIsPhoEnabled] = useState(false);
     const togglePhoSwitch = () => setIsPhoEnabled(previousState => !previousState);
-    const { docRef } = route.params;
+    const { uid } = route.params;
+    const docRef = doc(FIRESTORE_DB, "USERS", uid);
 
 
     const styles = StyleSheet.create({
@@ -86,7 +88,7 @@ function Setup( {route, navigation} )
             const sentToDB = updateDoc(docRef, { setup: false, fitness: "N/A", photo: false}).then(() => {
                 console.log("Sent to DB")
             })
-            navigation.navigate('FitnessSetup', {goToCamera: true, docRef: docRef})
+            navigation.navigate('FitnessSetup', {goToCamera: true, uid: uid})
         }
             
             
@@ -95,7 +97,7 @@ function Setup( {route, navigation} )
             const sentToDB = updateDoc(docRef, {setup: false, fitness: "N/A", photo: false}).then(() => {
                 console.log("Sent to DB")
             })
-            navigation.navigate('FitnessSetup', {goToCamera: false, docRef: docRef})
+            navigation.navigate('FitnessSetup', {goToCamera: false, uid: uid})
         }
             
         else if(phoEnabled && !fitEnabled)
@@ -103,7 +105,7 @@ function Setup( {route, navigation} )
             const sentToDB = updateDoc(docRef, {setup: false, fitness: "N/A", photo: false}).then(() => {
                 console.log("Sent to DB")
             })
-            navigation.navigate('Camera', {docRef: docRef})
+            navigation.navigate('CameraSetupInfo', {uid: uid})
         }
            
     }

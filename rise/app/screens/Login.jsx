@@ -29,8 +29,8 @@ const Login = ({navigation}) => {
             if (docSnap.exists()) {
                 console.log("Document data:", docSnap.data()["email"]);
                 if(docSnap.data()["setup"] === true)
-                    navigation.navigate('Camera', {uid: uid, docRef: docRef});
-                else navigation.navigate('Setup', {uid: uid, docRef: docRef});
+                    navigation.navigate('Camera', {uid: uid});
+                else navigation.navigate('Setup', {uid: uid});
             } else {
                 // docSnap.data() will be undefined in this case
                 console.log("No such document!");

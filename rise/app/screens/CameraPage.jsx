@@ -4,23 +4,46 @@ import { ref, uploadBytes } from "firebase/storage";
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, TouchableOpacity, Animated, Dimensions } from 'react-native';
+import * as Location from 'expo-location';
 import RegularText from '../components/text/regularText';
 import { FIRESTORE_DB, FIREBASE_STORAGE } from '../../firebaseConfig';
+import DefaultButton from '../components/buttons/defaultButton';
+import { updateDoc, doc } from 'firebase/firestore';
 
-function CameraPage({navigation})
+function CameraPage({navigation, route})
 {
     const [hasPermission, setHasPermission] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
+    const [cameraEnable, setCameraEnable] = useState(false);
     const cameraRef = useRef(null);
+    const [photoCount, setPhotoCount] = useState(1);
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const imageRef = collection(FIRESTORE_DB, 'images');
+    const { uid } = route.params;
+    const userDoc = doc(FIRESTORE_DB, "USERS", uid);
+    // const [location, setLocation] = useState(null);
+    // const [errorMsg, setErrorMsg] = useState(null);
 
     useEffect(() => {
         (async () => {
         const { status } = await Camera.requestCameraPermissionsAsync();
         setHasPermission(status === 'granted');
+
+        // let { locationStatus } = await Location.requestForegroundPermissionsAsync();
+        // console.log(locationStatus)
+        // if (locationStatus !== 'granted') {
+        //   setErrorMsg('Permission to access location was denied');
+        //   return;
+        // }
+
         })();
     }, []);
+
+    // const getLocation = async () => {
+    //     let locations = await Location.getCurrentPositionAsync({});
+    //     setLocation(locations);
+    //     console.log(location);
+    // }
 
     const uploadPicture = async (uri) => {
         const doc = addDoc(imageRef, {imageuri: uri})
@@ -31,16 +54,29 @@ function CameraPage({navigation})
         console.log(blob.size, blob.type);
 
         //Uploads it to storage
-        const storageRef = ref(FIREBASE_STORAGE, 'image/' + Date.now())
+        const storageRef = ref(FIREBASE_STORAGE, 'images/users/' + uid + "/" + Date.now())
         uploadBytes(storageRef, blob).then((snapshot) => {
             console.log('Uploaded a blob or file!');
           });
+        setPhotoCount(photoCount+1);
+        console.log(photoCount)
+        setCameraEnable(false);
+        if(photoCount === 3)
+        {
+            const sentToDB = updateDoc(userDoc, {setup: true, photo: true}).then(() => {
+                console.log("Sent to DB")
+            })
+        }
+
+
+
 
 
 
     }
 
     const takePicture = async () => {
+        setCameraEnable(true);
         if (cameraRef.current) {
             const options = { quality: 0.5, base64: true };
             const data = await cameraRef.current.takePictureAsync(options);
@@ -82,21 +118,22 @@ function CameraPage({navigation})
                 marginBottom: 10,
                 marginHorizontal: 30
             }}>
+            {/* Location */}
             <TouchableOpacity
                 style={{
-                flex: 0.1,
+                flex: 0.2,
                 alignSelf: 'flex-end',
                 alignItems: 'center',
+                marginBottom: 25,
                 }}
+                disabled={true}
                 onPress={() => {
-                setType(
-                    type === Camera.Constants.Type.back
-                    ? Camera.Constants.Type.front
-                    : Camera.Constants.Type.back
-                );
+                    getLocation
                 }}>
-                <RegularText text={"F"} size={24} marginB={20}/>
+                    {(photoCount === 3) && <></>}
+                    {!(photoCount === 3) && <Ionicons name="location-outline" color="white" size={50}/>}
             </TouchableOpacity>
+            {/* Camera */}
             <TouchableOpacity
                 style={{
                 flex: .5,
@@ -105,19 +142,29 @@ function CameraPage({navigation})
                 marginBottom: 10,
                 }}
                 onPress={takePicture}
+                disabled={cameraEnable}
                 >
-                {/* <RegularText text={"O"} size={24} marginB={20}/> */}
-                <Ionicons name='ellipse-outline' color="white" size={100}/>
+                {(photoCount === 3) && <DefaultButton
+                    text={"Next"} 
+                    bgColor={'rgba(118, 118, 128, .30)'} 
+                    textColor={'white'}
+                    onPress={() => console.log("")}
+                    marginTop={150}
+                    />}
+                {!(photoCount === 3) && <Ionicons name='ellipse-outline' color="white" size={100}/>}
             </TouchableOpacity>
+            {/* Settings */}
             <TouchableOpacity
                 style={{
-                flex: 0.1,
+                flex: 0.2,
                 alignSelf: 'flex-end',
                 alignItems: 'center',
+                marginBottom: 25,
                 }}
                 onPress={takePicture}
                 >
-                <RegularText text={"N"} size={24} marginB={20}/>
+                {(photoCount === 3) && <></>}
+                {!(photoCount === 3) && <Ionicons name="settings-outline" color="white" size={50}/>}
             </TouchableOpacity>
             </View>
         </Camera>
