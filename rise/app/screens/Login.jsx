@@ -12,33 +12,35 @@ const Login = ({navigation}) => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [hasSetup, setHasSetup] = useState(false)
     const auth = getAuth();;
 
-    const signIn = (email, password) => {
-        console.log(email + password)
-        signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            console.log("test")
-            //signed in
+    const signIn = async (email, password) => {
+        console.log(email + password);
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    
+            // Signed in
             const user = userCredential.user;
-            //const docSnap = getDoc(FIRESTORE_DB, "USERS", user.uid)
-            console.log("test")
-
-            //const doc = addDoc(collection(FIRESTORE_DB, ), {title: todo, done: false})
+            const uid = user.uid;
+            const docSnap = await getDoc(doc(FIRESTORE_DB, "USERS", uid));
+    
             if (docSnap.exists()) {
-                console.log("Document data:", docSnap.data());
-              } else {
+                console.log("Document data:", docSnap.data()["email"]);
+                if(docSnap.data()["setup"] === true)
+                    navigation.navigate('Camera', {uid: uid});
+                else navigation.navigate('Setup', {uid: uid});
+            } else {
                 // docSnap.data() will be undefined in this case
                 console.log("No such document!");
-              }
-            console.log("Success!" + user.uid);
-            
-        })
-        .catch((error) => {
+            }
+        } catch (error) {
             const errorCode = error.code;
             const errorMessage = error.message;
-        })
+            console.error(`Error [${errorCode}]: ${errorMessage}`);
+        }
     }
+    
 
     const styles = StyleSheet.create({
         background: {
