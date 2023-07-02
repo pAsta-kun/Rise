@@ -3,9 +3,7 @@ import {View, Switch, ImageBackground, StyleSheet} from 'react-native';
 import RegularText from '../components/text/regularText';
 import LargeText from '../components/text/largeText';
 import DefaultButton from '../components/buttons/defaultButton';
-import { updateDoc , doc } from 'firebase/firestore'
-import { FIRESTORE_DB } from '../../firebaseConfig';
-// import { userID } from '../../firebaseConfig';
+import { updateDoc } from 'firebase/firestore'
 
 import React, { useState } from 'react';    
 
@@ -15,7 +13,7 @@ function Setup( {route, navigation} )
     const toggleFitSwitch = () => setIsFitEnabled(previousState => !previousState);
     const [isPhoEnabled, setIsPhoEnabled] = useState(false);
     const togglePhoSwitch = () => setIsPhoEnabled(previousState => !previousState);
-    const { uid } = route.params;
+    const { docRef } = route.params;
 
 
     const styles = StyleSheet.create({
@@ -85,27 +83,27 @@ function Setup( {route, navigation} )
             // console.log(userID);
             // const user = firebase.auth().currentUser;
             // console.log(user.uid);
-            const sentToDB = updateDoc(doc(FIRESTORE_DB, "USERS", uid), { setup: false, fitness: "N/A", photo: true}).then(() => {
+            const sentToDB = updateDoc(docRef, { setup: false, fitness: "N/A", photo: false}).then(() => {
                 console.log("Sent to DB")
             })
-            navigation.navigate('Camera')
+            navigation.navigate('FitnessSetup', {goToCamera: true, docRef: docRef})
         }
             
             
         else if(fitEnabled && !phoEnabled)
         {
-            const sentToDB = updateDoc(doc(FIRESTORE_DB, "USERS", uid), {setup: false, fitness: "N/A", photo: false}).then(() => {
+            const sentToDB = updateDoc(docRef, {setup: false, fitness: "N/A", photo: false}).then(() => {
                 console.log("Sent to DB")
             })
-            navigation.navigate('FitnessSetup')
+            navigation.navigate('FitnessSetup', {goToCamera: false, docRef: docRef})
         }
             
         else if(phoEnabled && !fitEnabled)
         {
-            const sentToDB = updateDoc(doc(FIRESTORE_DB, "USERS", uid), {setup: false, fitness: "N/A", photo: true}).then(() => {
+            const sentToDB = updateDoc(docRef, {setup: false, fitness: "N/A", photo: false}).then(() => {
                 console.log("Sent to DB")
             })
-            navigation.navigate('List')
+            navigation.navigate('Camera', {docRef: docRef})
         }
            
     }

@@ -25,7 +25,7 @@ const CreateAccount = ({navigation}) => {
                 console.log("Sent to DB")
             })
 
-            navigation.navigate('Setup', {uid: uid});
+            navigation.navigate('Setup', {docRef: doc(FIRESTORE_DB, "USERS", user.uid)});
         })
         .catch((error) => {
             const errorCode = error.code;

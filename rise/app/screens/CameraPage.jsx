@@ -1,14 +1,13 @@
 import { Camera } from 'expo-camera';
 import { addDoc, collection } from 'firebase/firestore';
 import { ref, uploadBytes } from "firebase/storage";
-
+import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useState, useEffect, useRef } from 'react';
-import {Entypo} from '@expo/vector-icons'
 import { Text, View, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import RegularText from '../components/text/regularText';
 import { FIRESTORE_DB, FIREBASE_STORAGE } from '../../firebaseConfig';
 
-function CameraPage()
+function CameraPage({navigation})
 {
     const [hasPermission, setHasPermission] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
@@ -48,18 +47,18 @@ function CameraPage()
             console.log(data.uri);
             uploadPicture(data.uri)
 
-            Animated.sequence([
-                Animated.timing(fadeAnim, {
-                    toValue: 1,
-                    duration: 100,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(fadeAnim, {
-                    toValue: 0,
-                    duration: 100,
-                    useNativeDriver: true,
-                })
-            ]).start();
+            // Animated.sequence([
+            //     Animated.timing(fadeAnim, {
+            //         toValue: 1,
+            //         duration: 100,
+            //         useNativeDriver: true,
+            //     }),
+            //     Animated.timing(fadeAnim, {
+            //         toValue: 0,
+            //         duration: 100,
+            //         useNativeDriver: true,
+            //     })
+            // ]).start();
         }
     };
 
@@ -100,14 +99,15 @@ function CameraPage()
             </TouchableOpacity>
             <TouchableOpacity
                 style={{
-                flex: 0.1,
+                flex: .5,
                 alignSelf: 'flex-end',
                 alignItems: 'center',
+                marginBottom: 10,
                 }}
                 onPress={takePicture}
                 >
-                <RegularText text={"O"} size={24} marginB={20}/>
-                {/* <Entypo name="circle" size={70} color="white"/> */}
+                {/* <RegularText text={"O"} size={24} marginB={20}/> */}
+                <Ionicons name='ellipse-outline' color="white" size={100}/>
             </TouchableOpacity>
             <TouchableOpacity
                 style={{

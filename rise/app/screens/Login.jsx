@@ -23,13 +23,14 @@ const Login = ({navigation}) => {
             // Signed in
             const user = userCredential.user;
             const uid = user.uid;
-            const docSnap = await getDoc(doc(FIRESTORE_DB, "USERS", uid));
+            const docRef = doc(FIRESTORE_DB, "USERS", uid);
+            const docSnap = await getDoc(docRef);
     
             if (docSnap.exists()) {
                 console.log("Document data:", docSnap.data()["email"]);
                 if(docSnap.data()["setup"] === true)
-                    navigation.navigate('Camera', {uid: uid});
-                else navigation.navigate('Setup', {uid: uid});
+                    navigation.navigate('Camera', {uid: uid, docRef: docRef});
+                else navigation.navigate('Setup', {uid: uid, docRef: docRef});
             } else {
                 // docSnap.data() will be undefined in this case
                 console.log("No such document!");

@@ -2,18 +2,18 @@ import {View, TextInput, ImageBackground, StyleSheet, TouchableWithoutFeedback, 
 import LargeText from '../components/text/largeText';
 import RegularText from '../components/text/regularText';
 import DefaultButton from '../components/buttons/defaultButton';
+import { updateDoc } from 'firebase/firestore'
 import React, { useState } from 'react'; 
 
-const FitnessSetup = ({navigation}) => 
+const FitnessSetup = ({navigation, route }) => 
 {
-    const router = useRouter();
-    const [value, setValue] = useState('');
+    const { goToCamera, docRef } = route.params;
+    const [value, setValue] = useState();
     const dismissKeyboard = () => {
         if(Keyboard !== undefined)
                 Keyboard.dismiss();
                 dismissKeyboard
     };
-    const { state } = useLocalSearchParams();
     const styles = StyleSheet.create({
         background: {
             flex:1,
@@ -29,11 +29,15 @@ const FitnessSetup = ({navigation}) =>
     });
     function nextPage(state)
     {
+        const sentToDB = updateDoc(docRef, {setup: false, fitness: parseInt(value), photo: false}).then(() => {
+            console.log("Sent to DB")
+        })
+
         console.log(state);
-        if (state == 'false') {
-            router.push("/riseSetup")
+        if (state) {
+            navigation.navigate('Camera')
         } else {
-            router.push("/photoSetupExplain")
+            navigation.navigate('Login')
         }
     }
     return (
@@ -62,7 +66,8 @@ const FitnessSetup = ({navigation}) =>
                     text={"Next"} 
                     bgColor={'rgba(118, 118, 128, .30)'} 
                     textColor={'white'}
-                    onPress={() => {nextPage(state)}}
+                    onPress={() => {nextPage(goToCamera)}}
+                    disabled={value === ''}
                     marginTop={300}
                     />
                 </View>
