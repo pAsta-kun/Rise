@@ -8,15 +8,16 @@ import * as Location from 'expo-location';
 import RegularText from '../components/text/regularText';
 import { FIRESTORE_DB, FIREBASE_STORAGE } from '../../firebaseConfig';
 import DefaultButton from '../components/buttons/defaultButton';
-import { updateDoc, doc } from 'firebase/firestore';
+import { updateDoc, doc, getDoc } from 'firebase/firestore';
 
 function CameraPage({navigation, route})
 {
     const [hasPermission, setHasPermission] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
+    const [photoValue, setPhotoValue] = useState(false)
     const [cameraEnable, setCameraEnable] = useState(false);
     const cameraRef = useRef(null);
-    const [photoCount, setPhotoCount] = useState(1);
+    const [photoCount, setPhotoCount] = useState(0);
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const imageRef = collection(FIRESTORE_DB, 'images');
     const { uid } = route.params;
@@ -28,6 +29,7 @@ function CameraPage({navigation, route})
         (async () => {
         const { status } = await Camera.requestCameraPermissionsAsync();
         setHasPermission(status === 'granted');
+        isPhoto()
 
         // let { locationStatus } = await Location.requestForegroundPermissionsAsync();
         // console.log(locationStatus)
@@ -45,6 +47,12 @@ function CameraPage({navigation, route})
     //     console.log(location);
     // }
 
+    const isPhoto = async() => {
+        const docSnap = await getDoc(docRef);
+        const photo = docSnap.data()["photo"];
+        setPhotoValue(photo)
+    }
+
     const uploadPicture = async (uri) => {
         const doc = addDoc(imageRef, {imageuri: uri})
 
@@ -61,7 +69,7 @@ function CameraPage({navigation, route})
         setPhotoCount(photoCount+1);
         console.log(photoCount)
         setCameraEnable(false);
-        if(photoCount === 3)
+        if(photoCount === 2 && !photoValue)
         {
             const sentToDB = updateDoc(userDoc, {setup: true, photo: true}).then(() => {
                 console.log("Sent to DB")
@@ -130,8 +138,8 @@ function CameraPage({navigation, route})
                 onPress={() => {
                     getLocation
                 }}>
-                    {(photoCount === 3) && <></>}
-                    {!(photoCount === 3) && <Ionicons name="location-outline" color="white" size={50}/>}
+                    {((photoCount === 3) && !photoValue) && <></>}
+                    {(!(photoCount === 3) || photoValue)  && <Ionicons name="location-outline" color="white" size={50}/>}
             </TouchableOpacity>
             {/* Camera */}
             <TouchableOpacity
@@ -144,14 +152,14 @@ function CameraPage({navigation, route})
                 onPress={takePicture}
                 disabled={cameraEnable}
                 >
-                {(photoCount === 3) && <DefaultButton
+                {((photoCount === 3) && !photoValue) && <DefaultButton
                     text={"Next"} 
                     bgColor={'rgba(118, 118, 128, .30)'} 
                     textColor={'white'}
-                    onPress={() => console.log("")}
+                    onPress={() => navigation.navigate('Home', {uid: uid})}
                     marginTop={150}
                     />}
-                {!(photoCount === 3) && <Ionicons name='ellipse-outline' color="white" size={100}/>}
+                {(!(photoCount === 3) || photoValue) && <Ionicons name='ellipse-outline' color="white" size={100}/>}
             </TouchableOpacity>
             {/* Settings */}
             <TouchableOpacity
@@ -163,8 +171,8 @@ function CameraPage({navigation, route})
                 }}
                 onPress={takePicture}
                 >
-                {(photoCount === 3) && <></>}
-                {!(photoCount === 3) && <Ionicons name="settings-outline" color="white" size={50}/>}
+                {((photoCount === 3) && !photoValue) && <></>}
+                {(!(photoCount === 3) || photoValue) && <Ionicons name="settings-outline" color="white" size={50}/>}
             </TouchableOpacity>
             </View>
         </Camera>

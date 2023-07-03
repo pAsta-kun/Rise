@@ -29,7 +29,7 @@ const Login = ({navigation}) => {
             if (docSnap.exists()) {
                 console.log("Document data:", docSnap.data()["email"]);
                 if(docSnap.data()["setup"] === true)
-                    navigation.navigate('Camera', {uid: uid});
+                    navigation.navigate('Home', {uid: uid});
                 else navigation.navigate('Setup', {uid: uid});
             } else {
                 // docSnap.data() will be undefined in this case
