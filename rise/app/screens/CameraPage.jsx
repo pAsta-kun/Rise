@@ -9,12 +9,16 @@ import RegularText from '../components/text/regularText';
 import { FIRESTORE_DB, FIREBASE_STORAGE } from '../../firebaseConfig';
 import DefaultButton from '../components/buttons/defaultButton';
 import { updateDoc, doc, getDoc } from 'firebase/firestore';
+import { Image } from 'react-native';
+import axios from 'axios';
+
 
 function CameraPage({navigation, route})
 {
     const [hasPermission, setHasPermission] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
     const [photoValue, setPhotoValue] = useState(false)
+    const [setupValue, setSetupValue] = useState(false)
     const [cameraEnable, setCameraEnable] = useState(false);
     const cameraRef = useRef(null);
     const [photoCount, setPhotoCount] = useState(0);
@@ -29,7 +33,8 @@ function CameraPage({navigation, route})
         (async () => {
         const { status } = await Camera.requestCameraPermissionsAsync();
         setHasPermission(status === 'granted');
-        isPhoto()
+        isPhoto();
+        hasSetup();
 
         // let { locationStatus } = await Location.requestForegroundPermissionsAsync();
         // console.log(locationStatus)
@@ -48,18 +53,65 @@ function CameraPage({navigation, route})
     // }
 
     const isPhoto = async() => {
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(userDoc);
         const photo = docSnap.data()["photo"];
         setPhotoValue(photo)
+    }
+    const hasSetup = async() => {
+        const docSnap = await getDoc(userDoc);
+        const setup = docSnap.data()["setup"];
+        setSetupValue(setup)
+        console.log(setup)
+    }
+
+    // const compareImage = async(uri) => {
+
+
+    //     setCameraEnable(false);
+    //     const image = await fetch(require("./img2.jpg"));
+
+    //     const blob = await image.blob();        
+    //     console.log("1")
+    //     const formData = new FormData();
+    //     console.log("2")
+    //     formData.append('imageA', {
+    //         name: 'imageA.jpg',
+    //         uri: blob,
+    //         type: 'image/jpeg',
+    //     });
+    //     formData.append('imageB', {
+    //         name: 'imageB.jpg',
+    //         uri: blob,
+    //         type: 'image/jpeg',
+    //     });
+    //     console.log("3")
+    
+    //     try {
+    //         const response = await axios.post("http://192.168.1.77:5000/compare", formData, {
+    //             headers: {
+    //                 'Content-Type': 'multipart/form-data',
+    //             },
+    //         })
+    //         console.log(response);
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+        
+    // }
+    
+
+    const convertToBlob = async(uri) => {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        console.log(blob.size, blob.type);
+        return blob;
     }
 
     const uploadPicture = async (uri) => {
         const doc = addDoc(imageRef, {imageuri: uri})
 
         //Translates uri to blob
-        const response = await fetch(uri);
-        const blob = await response.blob();
-        console.log(blob.size, blob.type);
+        const blob = convertToBlob(uri);
 
         //Uploads it to storage
         const storageRef = ref(FIREBASE_STORAGE, 'images/users/' + uid + "/" + Date.now())
@@ -75,12 +127,6 @@ function CameraPage({navigation, route})
                 console.log("Sent to DB")
             })
         }
-
-
-
-
-
-
     }
 
     const takePicture = async () => {
@@ -89,7 +135,14 @@ function CameraPage({navigation, route})
             const options = { quality: 0.5, base64: true };
             const data = await cameraRef.current.takePictureAsync(options);
             console.log(data.uri);
+        if(!setupValue)
+        {
             uploadPicture(data.uri)
+        }
+        else{
+            compareImage(data.uri)
+        }
+            
 
             // Animated.sequence([
             //     Animated.timing(fadeAnim, {
