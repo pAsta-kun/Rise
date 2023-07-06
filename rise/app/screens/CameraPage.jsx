@@ -11,6 +11,8 @@ import DefaultButton from '../components/buttons/defaultButton';
 import { updateDoc, doc, getDoc } from 'firebase/firestore';
 import { Image } from 'react-native';
 import axios from 'axios';
+import FormData from 'form-data';
+import fs from 'fs';
 
 
 function CameraPage({navigation, route})
@@ -98,6 +100,26 @@ function CameraPage({navigation, route})
     //     }
         
     // }
+
+    // const compareImage = (file, file2) => {
+    //     let form = new FormData();
+    //     form.append('imageA', fs.createReadStream('./img2.jpg'));
+    //     form.append('imageB', fs.createReadStream('./img2.jpg'));
+        
+    //     axios({
+    //       method: 'post',
+    //       url: 'http://localhost:5000/compare',
+    //       data: form,
+    //       headers: form.getHeaders()
+    //     })
+    //     .then((response) => {
+    //       console.log(response.data);
+    //     })
+    //     .catch((error) => {
+    //       console.error(error);
+    //     });
+    // });
+    // }
     
 
     const convertToBlob = async(uri) => {
@@ -140,7 +162,7 @@ function CameraPage({navigation, route})
             uploadPicture(data.uri)
         }
         else{
-            compareImage(data.uri)
+            compareImage()
         }
             
 
