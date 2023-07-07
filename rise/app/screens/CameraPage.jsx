@@ -1,20 +1,14 @@
 import { Camera } from 'expo-camera';
 import { addDoc, collection } from 'firebase/firestore';
-import { ref, uploadBytes } from "firebase/storage";
+import { ref, uploadBytes, getStorage, listAll } from "firebase/storage";
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, TouchableOpacity, Animated, Dimensions } from 'react-native';
-import * as Location from 'expo-location';
-import RegularText from '../components/text/regularText';
 import { FIRESTORE_DB, FIREBASE_STORAGE } from '../../firebaseConfig';
 import DefaultButton from '../components/buttons/defaultButton';
 import { updateDoc, doc, getDoc } from 'firebase/firestore';
-import { Image } from 'react-native';
 import axios from 'axios';
 import FormData from 'form-data';
-import * as FileSystem from 'expo-file-system';
-import { Asset } from 'expo-asset';
-
 
 function CameraPage({navigation, route})
 {
@@ -67,42 +61,26 @@ function CameraPage({navigation, route})
         console.log(setup)
     }
 
-    // const compareImage = async(uri) => {
-
-
-    //     setCameraEnable(false);
-    //     const image = await fetch(require("./img2.jpg"));
-
-    //     const blob = await image.blob();        
-    //     console.log("1")
-    //     const formData = new FormData();
-    //     console.log("2")
-    //     formData.append('imageA', {
-    //         name: 'imageA.jpg',
-    //         uri: blob,
-    //         type: 'image/jpeg',
-    //     });
-    //     formData.append('imageB', {
-    //         name: 'imageB.jpg',
-    //         uri: blob,
-    //         type: 'image/jpeg',
-    //     });
-    //     console.log("3")
-    
-    //     try {
-    //         const response = await axios.post("http://192.168.1.77:5000/compare", formData, {
-    //             headers: {
-    //                 'Content-Type': 'multipart/form-data',
-    //             },
-    //         })
-    //         console.log(response);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-        
-    // }
 
     const compareImage = async (uri) => {
+        setCameraEnable(false);
+        // FIREBASE_STORAGE, 'images/users/' + uid
+        const listRef = ref(FIREBASE_STORAGE, 'images/users/' + uid)
+        listAll(listRef)
+        .then((res) => {
+          res.prefixes.forEach((folderRef) => {
+            // All the prefixes under listRef.
+            // You may call listAll() recursively on them.
+            //console.log(folderRef)
+          });
+          res.items.forEach((itemRef) => {
+            // All the items under listRef.
+            console.log(itemRef._location.path_)
+          });
+        }).catch((error) => {
+          // Uh-oh, an error occurred!
+          console.log(error)
+        });
         // Generate blob from the uri
         const response = await fetch(uri);
         const blob = await response.blob();
