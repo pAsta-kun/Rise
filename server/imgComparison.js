@@ -45,7 +45,9 @@ app.post('/compare', upload.fields([{ name: 'imageA', maxCount: 1 }, { name: 'im
         fs.unlinkSync(imageBPath);
     });
 });
+const ip = '192.168.1.77'; // for example
+const port = 5000;
 
-const server = app.listen(5000, () => {
-    console.log(`Server is running at http://localhost:${server.address().port}`);
+const server = app.listen(port, ip, () => {
+    console.log(`Server is running at http://${ip}:${server.address().port}`);
 });

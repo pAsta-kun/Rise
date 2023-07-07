@@ -12,7 +12,8 @@ import { updateDoc, doc, getDoc } from 'firebase/firestore';
 import { Image } from 'react-native';
 import axios from 'axios';
 import FormData from 'form-data';
-import fs from 'fs';
+import * as FileSystem from 'expo-file-system';
+import { Asset } from 'expo-asset';
 
 
 function CameraPage({navigation, route})
@@ -101,25 +102,48 @@ function CameraPage({navigation, route})
         
     // }
 
-    // const compareImage = (file, file2) => {
-    //     let form = new FormData();
-    //     form.append('imageA', fs.createReadStream('./img2.jpg'));
-    //     form.append('imageB', fs.createReadStream('./img2.jpg'));
-        
-    //     axios({
-    //       method: 'post',
-    //       url: 'http://localhost:5000/compare',
-    //       data: form,
-    //       headers: form.getHeaders()
-    //     })
-    //     .then((response) => {
-    //       console.log(response.data);
-    //     })
-    //     .catch((error) => {
-    //       console.error(error);
-    //     });
-    // });
-    // }
+    const compareImage = async (uri) => {
+        // Generate blob from the uri
+        const response = await fetch(uri);
+        const blob = await response.blob();
+    
+        // Create a new name for the image file
+        const imageName = uri.split("/").pop();
+    
+        // Create a new FormData instance
+        let form = new FormData();
+    
+        // Append the blob to the FormData instance, giving it the name `imageA`
+        form.append('imageA', {
+            name: imageName,
+            type: 'image/jpeg',
+            uri: uri,
+        });
+    
+        // Similarly, append the same image as `imageB` (or use another image if needed)
+        form.append('imageB', {
+            name: imageName,
+            type: 'image/jpeg',
+            uri: uri,
+        });
+    
+        // Use Axios to send a POST request with the image in the form data
+        axios({
+            method: 'post',
+            url: 'http://192.168.1.77:5000/compare',
+            data: form,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        .then((response) => {
+            console.log(response.data);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    }
+    
     
 
     const convertToBlob = async(uri) => {
@@ -162,7 +186,7 @@ function CameraPage({navigation, route})
             uploadPicture(data.uri)
         }
         else{
-            compareImage()
+            compareImage(data.uri)
         }
             
 
