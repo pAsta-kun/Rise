@@ -1,6 +1,6 @@
 import { Camera } from 'expo-camera';
 import { addDoc, collection } from 'firebase/firestore';
-import { ref, uploadBytes, getStorage, listAll } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, TouchableOpacity, Animated, Dimensions } from 'react-native';
@@ -61,44 +61,52 @@ function CameraPage({navigation, route})
         console.log(setup)
     }
 
-
-    const compareImage = async (uri) => {
-        setCameraEnable(false);
-        // FIREBASE_STORAGE, 'images/users/' + uid
+    const getImage = async(uri) => {
         const listRef = ref(FIREBASE_STORAGE, 'images/users/' + uid)
         listAll(listRef)
         .then((res) => {
-          res.prefixes.forEach((folderRef) => {
-            // All the prefixes under listRef.
-            // You may call listAll() recursively on them.
-            //console.log(folderRef)
+          res.items.forEach( async (itemRef) => {
+
+            const itemRefPath =  itemRef._location.path_;
+            getDownloadURL(ref(FIREBASE_STORAGE, itemRefPath)).then((url) => {
+                console.log(url);
+            })
+            
+            // .then( async (url) => {
+            //     const response = await fetch(url)
+            //     console.log("fetched")
+            //     const blob = await response.blob()
+            //     console.log("Translated to blob")
+            //     console.log(blob.size, blob.type)
+            // });
           });
-          res.items.forEach((itemRef) => {
-            // All the items under listRef.
-            console.log(itemRef._location.path_)
-          });
+          
         }).catch((error) => {
           // Uh-oh, an error occurred!
           console.log(error)
         });
-        // Generate blob from the uri
+    }
+
+    const compareImage = async (uri) => {
+        setCameraEnable(false);
+        getImage(uri)
+        // FIREBASE_STORAGE, 'images/users/' + uid
+        // blob from the uri
         const response = await fetch(uri);
         const blob = await response.blob();
     
-        // Create a new name for the image file
         const imageName = uri.split("/").pop();
     
-        // Create a new FormData instance
         let form = new FormData();
     
-        // Append the blob to the FormData instance, giving it the name `imageA`
+        // blob => formdata = imageA
         form.append('imageA', {
             name: imageName,
             type: 'image/jpeg',
             uri: uri,
         });
     
-        // Similarly, append the same image as `imageB` (or use another image if needed)
+        // blob => formdata = imageB
         form.append('imageB', {
             name: imageName,
             type: 'image/jpeg',
@@ -122,26 +130,19 @@ function CameraPage({navigation, route})
         });
     }
     
-    
-
-    const convertToBlob = async(uri) => {
-        const response = await fetch(uri);
-        const blob = await response.blob();
-        console.log(blob.size, blob.type);
-        return blob;
-    }
 
     const uploadPicture = async (uri) => {
         const doc = addDoc(imageRef, {imageuri: uri})
 
         //Translates uri to blob
-        const blob = convertToBlob(uri);
-
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        console.log(blob.size, blob.type);
         //Uploads it to storage
         const storageRef = ref(FIREBASE_STORAGE, 'images/users/' + uid + "/" + Date.now())
         uploadBytes(storageRef, blob).then((snapshot) => {
             console.log('Uploaded a blob or file!');
-          });
+        });
         setPhotoCount(photoCount+1);
         console.log(photoCount)
         setCameraEnable(false);
@@ -168,18 +169,18 @@ function CameraPage({navigation, route})
         }
             
 
-            // Animated.sequence([
-            //     Animated.timing(fadeAnim, {
-            //         toValue: 1,
-            //         duration: 100,
-            //         useNativeDriver: true,
-            //     }),
-            //     Animated.timing(fadeAnim, {
-            //         toValue: 0,
-            //         duration: 100,
-            //         useNativeDriver: true,
-            //     })
-            // ]).start();
+            Animated.sequence([
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 100,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(fadeAnim, {
+                    toValue: 0,
+                    duration: 100,
+                    useNativeDriver: true,
+                })
+            ]).start();
         }
     };
 
