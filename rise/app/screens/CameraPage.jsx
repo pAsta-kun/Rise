@@ -61,7 +61,7 @@ function CameraPage({navigation, route})
         console.log(setup)
     }
 
-    const getImage = async(uri) => {
+    const getImagURI = async(uri) => {
         const listRef = ref(FIREBASE_STORAGE, 'images/users/' + uid)
         listAll(listRef)
         .then((res) => {
@@ -70,6 +70,7 @@ function CameraPage({navigation, route})
             const itemRefPath =  itemRef._location.path_;
             getDownloadURL(ref(FIREBASE_STORAGE, itemRefPath)).then((url) => {
                 console.log(url);
+                compareImage(uri, url)
             })
             
             // .then( async (url) => {
@@ -87,30 +88,33 @@ function CameraPage({navigation, route})
         });
     }
 
-    const compareImage = async (uri) => {
+    const compareImage = async (uriA, uriB) => {
         setCameraEnable(false);
-        getImage(uri)
         // FIREBASE_STORAGE, 'images/users/' + uid
         // blob from the uri
-        const response = await fetch(uri);
-        const blob = await response.blob();
-    
-        const imageName = uri.split("/").pop();
+        const responseA = await fetch(uriA);
+        const blobA = await responseA.blob();
+        const imageNameA = uriA.split("/").pop();
+
+        const responseB = await fetch(uriB);
+        const blobB = await responseB.blob();
+        const imageNameB = uriB.split("/").pop();
+
     
         let form = new FormData();
     
         // blob => formdata = imageA
         form.append('imageA', {
-            name: imageName,
+            name: imageNameA,
             type: 'image/jpeg',
-            uri: uri,
+            uri: uriA,
         });
     
         // blob => formdata = imageB
         form.append('imageB', {
-            name: imageName,
+            name: imageNameB,
             type: 'image/jpeg',
-            uri: uri,
+            uri: uriB,
         });
     
         // Use Axios to send a POST request with the image in the form data
@@ -165,7 +169,7 @@ function CameraPage({navigation, route})
             uploadPicture(data.uri)
         }
         else{
-            compareImage(data.uri)
+            getImagURI(data.uri)
         }
             
 
